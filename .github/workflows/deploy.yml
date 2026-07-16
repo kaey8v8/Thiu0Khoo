@@ -20,12 +20,12 @@ jobs:
       - name: Inject Secrets into HTML
         run: |
              # 替換 index.html 金鑰
-             sed -i 's|INSERT_SUPABASE_URL_HERE|${{ secrets.SUPABASE_URL }}|g' index.html
-             sed -i 's|INSERT_SUPABASE_ANON_KEY_HERE|${{ secrets.SUPABASE_ANON_KEY }}|g' index.html
+             sed -i 's|SUPABASE_URL|${{ secrets.SUPABASE_URL }}|g' index.html
+             sed -i 's|SUPABASE_ANON_KEY|${{ secrets.SUPABASE_ANON_KEY }}|g' index.html
              
              # 替換 admin.html 金鑰
-             sed -i 's|INSERT_SUPABASE_URL_HERE|${{ secrets.SUPABASE_URL }}|g' admin.html
-             sed -i 's|INSERT_SUPABASE_ANON_KEY_HERE|${{ secrets.SUPABASE_ANON_KEY }}|g' admin.html
+             sed -i 's|SUPABASE_URL|${{ secrets.SUPABASE_URL }}|g' admin.html
+             sed -i 's|SUPABASE_ANON_KEY|${{ secrets.SUPABASE_ANON_KEY }}|g' admin.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
