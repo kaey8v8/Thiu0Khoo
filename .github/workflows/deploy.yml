@@ -4,22 +4,12 @@ on:
   push:
     branches: [ "main" ]
 
-# 賦予發布 GitHub Pages 的權限
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  contents: write # 給寫入權限，才能把改好的檔案推回 GitHub
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
     - name: Checkout code
@@ -30,20 +20,12 @@ jobs:
         MY_URL: ${{ vars.SUPABASE_URL }}
         MY_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       run: |
-        # 進行字串取代
         find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_URL__#$MY_URL#g" {} +
         find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_ANON_KEY__#$MY_KEY#g" {} +
-        
-        echo "=== 驗證虛擬機內檔案已修改 ==="
-        head -n 5 ./supabase-config.js
 
-    # 將目前修改完的所有檔案打包上傳
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+    # 自動開一個 gh-pages 分支並把檔案丟上去
+    - name: Deploy to GitHub Pages Branch
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        path: '.'
-
-    # 真正把剛剛打包的產物發布上線
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+        folder: .
+        branch: gh-pages
