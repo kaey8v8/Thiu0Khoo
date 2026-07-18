@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
 
-# 🌟 關鍵：必須賦予這個工作流發布 GitHub Pages 的權限
+# 賦予發布 GitHub Pages 的權限
 permissions:
   contents: read
   pages: write
@@ -18,6 +18,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # 🌟 修正點：必須在這裡指定部署環境，GitHub 才會允許 deploy-pages 動作執行！
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
     - name: Checkout code
@@ -31,12 +36,13 @@ jobs:
         find . -name "supabase-config.js" -exec sed -i "s#\__SUPABASE_URL__#$MY_URL#g" {} +
         find . -name "supabase-config.js" -exec sed -i "s#\__SUPABASE_ANON_KEY__#$MY_KEY#g" {} +
 
-    # 🌟 步驟 A：將剛剛修改完、帶有真實金鑰的專案資料夾打包（準備上傳）
+    # 將修改完、帶有真實金鑰的專案資料夾打包
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: '.' # 意思是打包目前所在的根目錄（包含 index.html, admin.html, supabase-config.js）
+        path: '.'
 
-    # 🌟 步驟 B：正式把打包好的檔案部署到 GitHub Pages 伺服器
+    # 正式把打包好的檔案部署到 GitHub Pages
     - name: Deploy to GitHub Pages
+      id: deployment # 加上 id 讓上方 environment.url 可以抓到正式網址
       uses: actions/deploy-pages@v4
