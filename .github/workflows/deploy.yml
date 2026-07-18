@@ -13,6 +13,11 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Inject Supabase Keys into Config JS
+      env:
+        # 宣告，Linux 指令（下面的 $MY_URL）才讀得到 GitHub 變數！
+        MY_URL: ${{ vars.SUPABASE_URL }}
+        MY_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       run: |
-        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_URL__#${{ vars.SUPABASE_URL }}#g" {} +
-        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_ANON_KEY__#${{ vars.SUPABASE_ANON_KEY }}#g" {} +
+        # 使用剛剛對應的環境變數進行替換
+        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_URL__#$MY_URL#g" {} +
+        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_ANON_KEY__#$MY_KEY#g" {} +
