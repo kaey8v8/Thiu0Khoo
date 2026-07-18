@@ -12,7 +12,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Inject Supabase Keys into HTML
+    - name: Inject Supabase Keys into ALL HTML files
       run: |
-        sed -i "s|__SUPABASE_URL__|${{ vars.SUPABASE_URL }}|g" index.html
-        sed -i "s|__SUPABASE_ANON_KEY__|${{ vars.SUPABASE_ANON_KEY }}|g" index.html
+        sed -i "s|__SUPABASE_URL__|${{ vars.SUPABASE_URL }}|g" *.html
+        sed -i "s|__SUPABASE_ANON_KEY__|${{ vars.SUPABASE_ANON_KEY }}|g" *.html
