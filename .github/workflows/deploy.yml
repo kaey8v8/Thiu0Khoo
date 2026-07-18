@@ -10,7 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-# 避免重複部署的衝突設定
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -18,8 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # 🌟 修正點：必須在這裡指定部署環境，GitHub 才會允許 deploy-pages 動作執行！
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -33,21 +30,20 @@ jobs:
         MY_URL: ${{ vars.SUPABASE_URL }}
         MY_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       run: |
-        # 移除反斜線 \，直接用最純粹的字串進行比對與取代
+        # 進行字串取代
         find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_URL__#$MY_URL#g" {} +
         find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_ANON_KEY__#$MY_KEY#g" {} +
         
-        # 測試：印出修改後的檔案內容（前幾行），確保真的有換成功
-        echo "=== 檢查取代後的檔案內容（前 5 行） ==="
-        head -n 5 ./supabase-config.js || head -n 5 $(find . -name "supabase-config.js" | head -n 1)
+        echo "=== 驗證虛擬機內檔案已修改 ==="
+        head -n 5 ./supabase-config.js
 
-    # 將修改完、帶有真實金鑰的專案資料夾打包
+    # 將目前修改完的所有檔案打包上傳
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: '.'
 
-    # 正式把打包好的檔案部署到 GitHub Pages
+    # 真正把剛剛打包的產物發布上線
     - name: Deploy to GitHub Pages
-      id: deployment # 加上 id 讓上方 environment.url 可以抓到正式網址
+      id: deployment
       uses: actions/deploy-pages@v4
