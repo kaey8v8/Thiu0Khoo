@@ -12,12 +12,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Inject Supabase Keys into Config JS
+    - name: Debug Environment Variables
       env:
-        # 宣告，Linux 指令（下面的 $MY_URL）才讀得到 GitHub 變數！
         MY_URL: ${{ vars.SUPABASE_URL }}
-        MY_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       run: |
-        # 使用剛剛對應的環境變數進行替換
-        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_URL__#$MY_URL#g" {} +
-        find . -name "supabase-config.js" -exec sed -i "s#__SUPABASE_ANON_KEY__#$MY_KEY#g" {} +
+        # 這行會檢查你的變數長度是否為 0
+        if [ -z "$MY_URL" ]; then
+          echo "❌ 錯誤：GitHub Actions 完全讀不到你的 vars.SUPABASE_URL，請檢查 GitHub Settings 變數有沒有填對！"
+          exit 1
+        else
+          echo "✅ 成功讀到變數，長度為: ${#MY_URL}"
+        fi
